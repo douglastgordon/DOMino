@@ -2,7 +2,7 @@ module.exports = {
   entry: "./lib/main.js",
   output: {
     path: __dirname,
-    filename: "DOMino.js"
+    filename: "domino.js"
 	},
 	devtool: "source-map"
 };

@@ -46,8 +46,8 @@
 
 	const DOMNodeCollection = __webpack_require__(1);
 	const _documentReadyFns = [];
-	
-	window.$l = arg => {
+
+	const $l = arg => {
 	  switch (typeof(arg)) {
 	    case "string":
 	      let nodes = document.querySelectorAll(arg);
@@ -58,13 +58,16 @@
 	        return new DOMNodeCollection([arg]);
 	      }
 	    case "function":
-	      _documentReadyFns.concat(arg);
+	      storeFn(arg);
 	  }
 	};
-	
+
+	let storeFn = fn => {
+	  _documentReadyFns.push(fn);
+	};
+
 	//merges objects
-	$l.extend
-	let hello = (object, ...newObjects) => {
+	$l.extend = (object, ...newObjects) => {
 	  newObjects.forEach((newObject) => {
 	    let newObjectKeys = Object.keys(newObject);
 	    newObjectKeys.forEach((key) => {
@@ -73,9 +76,10 @@
 	  });
 	  return object;
 	};
-	
+
 	//makes ajax request given options
 	$l.ajax = options => {
+
 	  const request = new XMLHttpRequest();
 	  const defaultOptions = {
 	    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -87,7 +91,7 @@
 	  };
 	  options = $l.extend(defaultOptions, options);
 	  options.method = options.method.toUpperCase();
-	
+
 	  if (options.method === "GET"){
 	    let queryString = "?";
 	    let dataKeys = Object.keys(options.data);
@@ -96,8 +100,8 @@
 	    });
 	    options.url += queryString.slice(0, queryString.length-1);
 	  }
-	
-	  request.open(options.method, options.url);
+
+	  request.open(options.method, options.url, true);
 	  request.onload = e => {
 	    if (request.status === 200) {
 	      options.success(request.response);
@@ -105,12 +109,14 @@
 	      options.error(request.response);
 	    }
 	  };
+	  request.send(JSON.stringify(options.data));
+
 	};
-	
+
+	window.$l = $l;
+
 	document.addEventListener('DOMContentLoaded', () => {
-	  _documentReadyFns.forEach( (fn) => {
-	    fn();
-	  });
+	  _documentReadyFns.forEach( fn => fn());
 	});
 
 
@@ -119,11 +125,11 @@
 /***/ function(module, exports) {
 
 	class DOMNodeCollection {
-	
+
 	  constructor(HTMLelements){
-	    this.elements = HTMLelements;
+	    this.elements = Array.from(HTMLelements);
 	  }
-	
+
 	  html(content) {
 	    if (content){ // sets innerHTML of each element if content provided
 	      this.elements.forEach( (element) => {
@@ -133,32 +139,31 @@
 	      return this.elements[0].innerHTML;
 	    }
 	  }
-	
+
 	  // sets innerHTML of every element to empty string
 	  empty() {
 	    this.html("");
 	  }
-	
+
 	  // appends string, HTMLElement or each element of a DOMNodeCollection
 	  // to each element of the current DOMNodeCollection
-	  append(content){
-	    switch (typeof(content)){
-	      case "string":
-	        this.elements.forEach ( (element) => {
-	          element.innerHTML += content;
-	        });
-	      case "object":
-	        if (!(content instanceof DOMNodeCollection )){
-	          content = new DOMNodeCollection(content);
-	        }
-	        content.elements.forEach( (elementToAppend) => {
-	          this.elements.forEach( (element) => {
-	            element.innerHTML += elementToAppend.outerHTML;
-	          });
-	        });
-	    }
-	  }
-	
+	  append(content) {
+			if (this.elements.length === 0) return;
+			switch(typeof(content)) {
+				case "object":
+					if (!(content instanceof DOMNodeCollection)) {
+					  content = $l(content);
+					}
+					this.elements.forEach( (element) => {
+			      content.elements.forEach(childNode => {
+			        element.appendChild(childNode.cloneNode(true));
+			      });
+			    });
+				case "string":
+					this.elements.forEach( (element) => element.innerHTML += content);
+			}
+		}
+
 	  // gets and sets HTML attributes
 	  attr(name, value){
 	    if (value){
@@ -171,7 +176,7 @@
 	     });
 	    }
 	  }
-	
+
 	  // add or remove classes from each element of DOMNodeCollection
 	  addClass(className){
 	    this.elements.forEach( (element) => {
@@ -183,7 +188,7 @@
 	      element.classList.remove(className);
 	    });
 	  }
-	
+
 	  // get immediate children of each element of DOMNodeCollection
 	  children() {
 	    let allChildren = [];
@@ -194,7 +199,7 @@
 	    });
 	    return new DOMNodeCollection(allChildren);
 	  }
-	
+
 	  // get parents of each element of DOMNodeCollection
 	  parents(){
 	    let allParents = [];
@@ -204,7 +209,7 @@
 	    });
 	    return new DOMNodeCollection(allParents);
 	  }
-	
+
 	  // find elements that match css selector
 	  find(selector){
 	    let allMatches = [];
@@ -214,33 +219,33 @@
 	    });
 	    return new DOMNodeCollection(allMatches);
 	  }
-	
+
 	  //remove all elements
 	  remove(){
 	    this.elements.forEach( (element) => {
 	      element.parentNode.removeChild(element);
 	    });
 	  }
-	
+
 	  //adds event listener
 	  on(type, callback){
 	    this.elements.forEach((el) => {
 	      el.addEventListener(type, callback);
 	    });
 	  }
-	
+
 	  //removes event listener
 	  off(type, callback){
 	    this.elements.forEach((el) => {
 	      el.removeEventListener(type, callback);
 	    });
 	  }
-	
+
 	}
-	
-	export default DOMNodeCollection;
+
+	module.exports = DOMNodeCollection;
 
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=DOMino.js.map
+//# sourceMappingURL=domino.js.map
