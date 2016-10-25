@@ -4,8 +4,7 @@
 
 The code snippet below shows how the messy job of appending an object or string to single or multiple HTML elements is conveniently packed into a single method:
 
-```
-//JavaScript
+```javascript
 
 append(content) {
   if (this.elements.length === 0) return;
