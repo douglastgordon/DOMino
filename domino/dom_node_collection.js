@@ -1,4 +1,3 @@
-
 class DOMNodeCollection {
 
   constructor(HTMLelements){
@@ -24,14 +23,12 @@ class DOMNodeCollection {
   // to each element of the current DOMNodeCollection
   append(content) {
     if (this.elements.length === 0) return;
-    // if (typeof content === 'object' &&
-    //     !(content instanceof DOMNodeCollection)) {
-    //   content = domino(content);
-    // }
+    if (typeof content === 'object' &&
+        !(content instanceof DOMNodeCollection)) {
+      content = $l(content);
+    }
     if (typeof content === "string") {
-      this.elements.forEach( (element) => {
-        element.innerHTML += content;
-      });
+      this.elements.forEach( (element) => element.innerHTML += content);
     } else if (content instanceof DOMNodeCollection) {
       this.elements.forEach( (element) => {
         content.elements.forEach(childNode => {

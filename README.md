@@ -24,3 +24,61 @@ append(content) {
 }
 
 ```
+
+## API
+
+To import DOMino:
+```javascript
+import domino from './DOMino/main.js'
+```
+
+Find elements with a selector:
+```javascript
+domino('h1')
+```
+
+Create a DOMino element:
+```javascript
+domino(<marquee>Watch me go!</marquee>)
+```
+
+Run a script after page loads:
+```javascript
+domino(() => {
+  console.log("Howdy!")
+});
+```
+
+### Class Methods
+
+####Make an ajax request:
+```javascript
+domino.ajax({
+  type: 'GET',
+  url: "someurl.com",
+  success(data) {
+    console.log(data)
+  },
+  error(){
+    console.log(":(")
+  }
+});
+```
+
+### Instance Methods
+
+#### .addClass(newClass)
+#### .append(child)
+#### .attr(name, value)
+#### .children()
+#### .empty()
+#### .find(selector)
+#### .html(content)
+#### .parent()
+#### .remove()
+#### .removeClass(class)
+
+### Event Listeners
+
+#### .on(action, callback)
+#### .off(action, callback)

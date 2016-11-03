@@ -1,7 +1,7 @@
 const DOMNodeCollection = require('./dom_node_collection');
 const _documentReadyFns = [];
 
-const $l = arg => {
+const domino = arg => {
   switch (typeof(arg)) {
     case "string":
       let nodes = document.querySelectorAll(arg);
@@ -21,7 +21,7 @@ let storeFn = fn => {
 };
 
 //merges objects
-$l.extend = (object, ...newObjects) => {
+domino.extend = (object, ...newObjects) => {
   newObjects.forEach((newObject) => {
     let newObjectKeys = Object.keys(newObject);
     newObjectKeys.forEach((key) => {
@@ -32,7 +32,7 @@ $l.extend = (object, ...newObjects) => {
 };
 
 //makes ajax request given options
-$l.ajax = options => {
+domino.ajax = options => {
 
   const request = new XMLHttpRequest();
   const defaultOptions = {
@@ -43,7 +43,7 @@ $l.ajax = options => {
     error: () => {},
     data: {},
   };
-  options = $l.extend(defaultOptions, options);
+  options = domino.extend(defaultOptions, options);
   options.method = options.method.toUpperCase();
 
   if (options.method === "GET"){
@@ -67,7 +67,7 @@ $l.ajax = options => {
 
 };
 
-window.$l = $l;
+window.domino = domino;
 
 document.addEventListener('DOMContentLoaded', () => {
   _documentReadyFns.forEach( fn => fn());
